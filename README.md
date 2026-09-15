@@ -89,6 +89,4 @@ SANGAM/
 
 ---
 
-## License
 
-This project is licensed under the MIT License - see the repository details for more information.
