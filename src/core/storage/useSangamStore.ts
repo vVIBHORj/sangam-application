@@ -3,6 +3,7 @@ import {
   UserRole, 
   SeniorProfile, 
   Relationship, 
+  CaregiverAssignment,
   Medication, 
   MedicationEvent, 
   DailyCheckIn, 
@@ -15,12 +16,16 @@ import {
   FamilyMessage, 
   CareTask, 
   HandoverReport, 
+  ChatMessage,
+  ChatThread,
   AuditEvent,
+  AuditAction,
   CheckInMood
 } from '../domain/types';
 import { 
   initialSeniorProfile, 
   initialRelationships, 
+  initialCaregiverAssignment,
   initialMedications, 
   initialMedicationEvents, 
   initialCheckIn, 
@@ -32,6 +37,9 @@ import {
   initialFamilyMessages, 
   initialCareTasks, 
   initialHandoverReport, 
+  initialChatThreads,
+  initialChatMessages,
+  initialAlertHistory,
   initialAuditEvents 
 } from './seedData';
 import { audioService } from '../services/audioService';
@@ -46,11 +54,15 @@ export interface SangamState {
   activeRole: UserRole;
   onboardingStep: 'CAREGIVER_FORM' | 'PAIRING_DISPLAY' | 'SENIOR_WELCOME_1' | 'SENIOR_WELCOME_2' | 'SENIOR_WELCOME_3';
   activeSeniorTab: 'HOME' | 'HEALTH' | 'FAMILY' | 'COMMUNITY' | 'PERMISSIONS' | 'SETTINGS';
+  activeSeniorCommunitySubTab: 'COMMUNITY' | 'CHAT';
   activeFamilyTab: 'DASHBOARD' | 'HEALTH' | 'ACTIVITY' | 'COORDINATION' | 'PROFILE';
-  activeCaregiverTab: 'SHIFT' | 'RESIDENTS' | 'HANDOVER' | 'ALERTS';
+  activeCaregiverTab: 'TODAY' | 'STATS' | 'TASKS' | 'ALERTS' | 'PROFILE';
+  activeChatThreadId: string | null;
+  caregiverStatPeriod: '7D' | '30D';
   
   // Domain State
   senior: SeniorProfile;
+  caregiverAssignment: CaregiverAssignment;
   relationships: Relationship[];
   medications: Medication[];
   medicationEvents: MedicationEvent[];
@@ -62,6 +74,9 @@ export interface SangamState {
   communityPost: CommunityPost;
   voiceReplies: VoiceReply[];
   familyMessages: FamilyMessage[];
+  chatThreads: ChatThread[];
+  chatMessages: ChatMessage[];
+  alertHistory: typeof initialAlertHistory;
   careTasks: CareTask[];
   handoverReport: HandoverReport;
   auditEvents: AuditEvent[];
@@ -73,6 +88,41 @@ export interface SangamState {
 
 const STORAGE_KEY = 'sangam_state_v1';
 
+const baseDefaults: SangamState = {
+  currentView: 'GATEWAY',
+  activeRole: 'OLDER_ADULT',
+  onboardingStep: 'CAREGIVER_FORM',
+  activeSeniorTab: 'HOME',
+  activeSeniorCommunitySubTab: 'COMMUNITY',
+  activeFamilyTab: 'DASHBOARD',
+  activeCaregiverTab: 'TODAY',
+  activeChatThreadId: 'thread-rohan',
+  caregiverStatPeriod: '7D',
+
+  senior: initialSeniorProfile,
+  caregiverAssignment: initialCaregiverAssignment,
+  relationships: initialRelationships,
+  medications: initialMedications,
+  medicationEvents: initialMedicationEvents,
+  checkIn: initialCheckIn,
+  sosIncident: null,
+  doctors: initialDoctors,
+  appointments: initialAppointments,
+  hospitalsPharmacies: initialHospitalsPharmacies,
+  communityPost: initialCommunityPost,
+  voiceReplies: initialVoiceReplies,
+  familyMessages: initialFamilyMessages,
+  chatThreads: initialChatThreads,
+  chatMessages: initialChatMessages,
+  alertHistory: initialAlertHistory,
+  careTasks: initialCareTasks,
+  handoverReport: initialHandoverReport,
+  auditEvents: initialAuditEvents,
+
+  fontScale: 1.0,
+  isAudioMuted: false,
+};
+
 const getInitialState = (): SangamState => {
   if (typeof window !== 'undefined') {
     try {
@@ -80,10 +130,11 @@ const getInitialState = (): SangamState => {
       if (saved) {
         const parsed = JSON.parse(saved);
         return {
+          ...baseDefaults,
           ...parsed,
-          // Always ensure healthy defaults
-          currentView: parsed.currentView || 'GATEWAY',
-          activeRole: parsed.activeRole || 'OLDER_ADULT',
+          activeCaregiverTab: parsed.activeCaregiverTab === 'SHIFT' ? 'TODAY' : (parsed.activeCaregiverTab || 'TODAY'),
+          checkIn: parsed.checkIn || baseDefaults.checkIn,
+          senior: parsed.senior || baseDefaults.senior,
         };
       }
     } catch {
@@ -91,33 +142,7 @@ const getInitialState = (): SangamState => {
     }
   }
 
-  return {
-    currentView: 'GATEWAY',
-    activeRole: 'OLDER_ADULT',
-    onboardingStep: 'CAREGIVER_FORM',
-    activeSeniorTab: 'HOME',
-    activeFamilyTab: 'DASHBOARD',
-    activeCaregiverTab: 'SHIFT',
-
-    senior: initialSeniorProfile,
-    relationships: initialRelationships,
-    medications: initialMedications,
-    medicationEvents: initialMedicationEvents,
-    checkIn: initialCheckIn,
-    sosIncident: null,
-    doctors: initialDoctors,
-    appointments: initialAppointments,
-    hospitalsPharmacies: initialHospitalsPharmacies,
-    communityPost: initialCommunityPost,
-    voiceReplies: initialVoiceReplies,
-    familyMessages: initialFamilyMessages,
-    careTasks: initialCareTasks,
-    handoverReport: initialHandoverReport,
-    auditEvents: initialAuditEvents,
-
-    fontScale: 1.0,
-    isAudioMuted: false,
-  };
+  return baseDefaults;
 };
 
 let globalState: SangamState = getInitialState();
@@ -196,6 +221,108 @@ export function useSangamStore() {
   const setFamilyTab = (tab: SangamState['activeFamilyTab']) => {
     audioService.playChimeTone('tap');
     updateSangamState(() => ({ activeFamilyTab: tab }));
+  };
+
+  const setSeniorCommunitySubTab = (subTab: SangamState['activeSeniorCommunitySubTab']) => {
+    audioService.playChimeTone('tap');
+    updateSangamState(() => ({ activeSeniorCommunitySubTab: subTab }));
+  };
+
+  const setActiveChatThread = (threadId: string | null) => {
+    updateSangamState(() => ({ activeChatThreadId: threadId }));
+  };
+
+  const setCaregiverStatPeriod = (period: '7D' | '30D') => {
+    updateSangamState((prev) => ({
+      caregiverStatPeriod: period,
+      auditEvents: [
+        {
+          id: `aud-${Date.now()}`,
+          timestamp: new Date().toISOString(),
+          actorName: 'Nurse Sunita',
+          actorRole: 'CAREGIVER',
+          action: 'CAREGIVER_STAT_PERIOD_CHANGED',
+          details: `Changed stats filter to ${period}`,
+        },
+        ...prev.auditEvents,
+      ],
+    }));
+  };
+
+  const sendChatMessage = (threadId: string, text?: string, voiceDurationSec?: number) => {
+    const isVoice = !!voiceDurationSec;
+    const thread = state.chatThreads.find((t) => t.id === threadId);
+    const senderRole = state.activeRole;
+    const senderName = senderRole === 'OLDER_ADULT' 
+      ? state.senior.preferredName 
+      : senderRole === 'FAMILY_MEMBER' 
+        ? 'Priya Sharma' 
+        : 'Nurse Sunita';
+
+    const newMessage: ChatMessage = {
+      id: `msg-${Date.now()}`,
+      threadId,
+      senderId: senderRole === 'OLDER_ADULT' ? state.senior.id : senderRole === 'FAMILY_MEMBER' ? 'fam-01' : 'care-01',
+      senderName,
+      senderRole,
+      type: isVoice ? 'VOICE_NOTE' : 'TEXT',
+      textMessage: text || (isVoice ? `Voice note (${voiceDurationSec}s)` : ''),
+      audioDurationSec: voiceDurationSec,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+
+    audioService.playChimeTone('tap');
+    if (senderRole === 'OLDER_ADULT') {
+      audioService.speak(isVoice ? 'Voice message sent.' : 'Message sent.');
+    }
+
+    updateSangamState((prev) => ({
+      chatMessages: [...prev.chatMessages, newMessage],
+      chatThreads: prev.chatThreads.map((t) => {
+        if (t.id === threadId) {
+          return {
+            ...t,
+            lastMessageText: newMessage.textMessage || 'Voice note',
+            lastMessageTime: 'Just now',
+          };
+        }
+        return t;
+      }),
+      auditEvents: [
+        {
+          id: `aud-${Date.now()}`,
+          timestamp: new Date().toISOString(),
+          actorName: senderName,
+          actorRole: senderRole,
+          action: isVoice ? 'CHAT_VOICE_MESSAGE_SENT' : 'CHAT_MESSAGE_SENT',
+          details: `Sent ${isVoice ? 'voice note' : 'message'} to ${thread ? thread.contactName : 'contact'}`,
+        },
+        ...prev.auditEvents,
+      ],
+    }));
+  };
+
+  const logAnalyticsEvent = (action: AuditAction, details: string) => {
+    const actorRole = state.activeRole;
+    const actorName = actorRole === 'OLDER_ADULT' 
+      ? state.senior.preferredName 
+      : actorRole === 'FAMILY_MEMBER' 
+        ? 'Priya Sharma' 
+        : 'Nurse Sunita';
+
+    updateSangamState((prev) => ({
+      auditEvents: [
+        {
+          id: `aud-${Date.now()}`,
+          timestamp: new Date().toISOString(),
+          actorName,
+          actorRole,
+          action,
+          details,
+        },
+        ...prev.auditEvents,
+      ],
+    }));
   };
 
   const setCaregiverTab = (tab: SangamState['activeCaregiverTab']) => {
@@ -525,7 +652,7 @@ export function useSangamStore() {
   };
 
   // Derived Inactivity Status
-  const inactivityStatus = inactivityEngine.calculateStatus(state.checkIn.timestamp);
+  const inactivityStatus = inactivityEngine.calculateStatus(state.checkIn?.timestamp || new Date().toISOString());
 
   // Derived Medication Adherence % (Taken / Total scheduled)
   const totalEvents = state.medicationEvents.length;
@@ -541,6 +668,11 @@ export function useSangamStore() {
     setSeniorTab,
     setFamilyTab,
     setCaregiverTab,
+    setSeniorCommunitySubTab,
+    setActiveChatThread,
+    setCaregiverStatPeriod,
+    sendChatMessage,
+    logAnalyticsEvent,
     markMedicationTaken,
     snoozeMedication,
     submitCheckIn,

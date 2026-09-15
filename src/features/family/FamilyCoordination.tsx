@@ -43,6 +43,62 @@ export const FamilyCoordination: React.FC = () => {
         </div>
       </div>
 
+      {/* Assigned Caregiver Section */}
+      <section style={{ marginBottom: '24px' }}>
+        <div style={{ fontSize: '16px', fontWeight: 700, color: '#17324D', marginBottom: '10px' }}>
+          Assigned Professional Caregiver
+        </div>
+        <TouchCard variant="white" padding="14px 16px" style={{ borderLeft: '6px solid #197278' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div
+                style={{
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: '50%',
+                  backgroundColor: '#FEF3F2',
+                  color: '#B42318',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 800,
+                  fontSize: '16px',
+                }}
+              >
+                SD
+              </div>
+              <div>
+                <div style={{ fontSize: '16px', fontWeight: 700, color: '#17324D' }}>
+                  Nurse Sunita Devi, RN
+                </div>
+                <div style={{ fontSize: '13px', color: '#197278', fontWeight: 600 }}>
+                  Active Shift: 08:00 – 16:00 • 8/10 tasks logged
+                </div>
+              </div>
+            </div>
+
+            <a
+              href="tel:+919876543210"
+              style={{
+                backgroundColor: '#EAF4F4',
+                color: '#197278',
+                border: '1px solid #C4DEDB',
+                borderRadius: '10px',
+                padding: '6px 12px',
+                fontSize: '13px',
+                fontWeight: 700,
+                textDecoration: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+              }}
+            >
+              <PhoneCall size={14} /> Call Caregiver
+            </a>
+          </div>
+        </TouchCard>
+      </section>
+
       {/* 1. Care Circle Members */}
       <section style={{ marginBottom: '24px' }}>
         <div style={{ fontSize: '16px', fontWeight: 700, color: '#17324D', marginBottom: '10px' }}>

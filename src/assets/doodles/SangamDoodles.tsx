@@ -62,17 +62,21 @@ export const VoiceWavesDoodle: React.FC<DoodleProps> = ({ size = 48, color = '#1
   </svg>
 );
 
-export const SangamLogo: React.FC<{ size?: number; showTagline?: boolean }> = ({ size = 40, showTagline = false }) => (
+export const SangamLogo: React.FC<{ size?: number; showTagline?: boolean }> = ({ size = 42, showTagline = false }) => (
   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-    <svg width={size} height={size} viewBox="0 0 44 44" fill="none">
-      <rect width="44" height="44" rx="14" fill="#17324D" />
-      {/* Confluence meeting waves */}
-      <path d="M12 28C16 20 22 18 32 18" stroke="#197278" strokeWidth="3.5" strokeLinecap="round" />
-      <path d="M12 18C16 26 22 28 32 28" stroke="#EAF4F4" strokeWidth="3.5" strokeLinecap="round" />
-      <circle cx="22" cy="23" r="3.5" fill="#F7F4EE" />
-    </svg>
+    <img
+      src="/sangam_logo.png"
+      alt="SANGAM Logo"
+      style={{
+        width: `${size}px`,
+        height: `${size}px`,
+        objectFit: 'contain',
+        borderRadius: '10px',
+        flexShrink: 0,
+      }}
+    />
     <div>
-      <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: `${size * 0.55}px`, fontWeight: 700, color: '#17324D', letterSpacing: '0.04em', lineHeight: 1 }}>
+      <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: `${Math.max(18, size * 0.5)}px`, fontWeight: 800, color: '#17324D', letterSpacing: '0.04em', lineHeight: 1 }}>
         SANGAM
       </div>
       {showTagline && (

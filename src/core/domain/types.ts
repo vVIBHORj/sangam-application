@@ -68,6 +68,7 @@ export interface Medication {
   timingLabel: string; // e.g. "Morning (After Breakfast)"
   scheduledTime: string; // "08:30"
   instructions: string; // "Take with warm water"
+  purpose?: string;
   shape: PillShape;
   colorCode: string; // e.g. "#197278"
   stockCount: number;
@@ -197,16 +198,26 @@ export interface FamilyMessage {
   listenedAt?: string;
 }
 
-export type TaskCategory = 'MEDICATION' | 'VITALS' | 'MEAL' | 'MOBILITY' | 'HYGIENE';
+export interface CaregiverAssignment {
+  id: string;
+  caregiverId: string;
+  caregiverName: string;
+  seniorId: string;
+  seniorName: string;
+  status: 'ACTIVE' | 'ENDED';
+  assignedAt: string;
+  endedAt?: string;
+}
+
+export type TaskCategory = 'MEDICATION' | 'VITALS' | 'MEAL' | 'MOBILITY' | 'HYGIENE' | 'APPOINTMENT';
 export type TaskStatus = 'PENDING' | 'DUE_NOW' | 'COMPLETED' | 'FLAGGED';
 
 export interface CareTask {
   id: string;
-  residentId: string;
-  residentName: string;
-  roomNumber: string;
+  seniorId: string;
   caregiverId: string;
   title: string;
+  description?: string;
   category: TaskCategory;
   scheduledTime: string;
   status: TaskStatus;
@@ -216,6 +227,7 @@ export interface CareTask {
     bloodSugar?: number; // e.g. 110 mg/dL
     spO2?: number; // e.g. 98%
     pulse?: number; // e.g. 72 bpm
+    weightKg?: number; // e.g. 64.5 kg
   };
   concernNote?: string;
 }
@@ -224,6 +236,7 @@ export interface HandoverReport {
   id: string;
   shiftName: string; // e.g. "Day Shift (08:00 – 16:00)"
   date: string;
+  seniorName: string;
   outgoingCaregiverName: string;
   incomingCaregiverName?: string;
   completedCount: number;
@@ -237,6 +250,31 @@ export interface HandoverReport {
   signedAt?: string;
 }
 
+export interface ChatMessage {
+  id: string;
+  threadId: string;
+  senderId: string;
+  senderName: string;
+  senderRole: UserRole;
+  type: 'TEXT' | 'VOICE_NOTE';
+  textMessage?: string;
+  audioDurationSec?: number;
+  timestamp: string;
+}
+
+export interface ChatThread {
+  id: string;
+  seniorId: string;
+  contactId: string;
+  contactName: string;
+  contactRole: string; // e.g. "Daughter", "Son", "Caregiver", "Doctor"
+  contactAvatar: string;
+  contactPhone: string;
+  unreadCount: number;
+  lastMessageText: string;
+  lastMessageTime: string;
+}
+
 export type AuditAction = 
   | 'ROLE_SWITCHED'
   | 'MEDICATION_TAKEN'
@@ -247,7 +285,20 @@ export type AuditAction =
   | 'SOS_RESOLVED'
   | 'PERMISSION_REVOKED'
   | 'TASK_COMPLETED'
-  | 'HANDOVER_SIGNED';
+  | 'HANDOVER_SIGNED'
+  | 'CAREGIVER_STATS_OPENED'
+  | 'CAREGIVER_STAT_PERIOD_CHANGED'
+  | 'CAREGIVER_TASK_COMPLETED'
+  | 'CAREGIVER_ALERT_OPENED'
+  | 'CAREGIVER_HANDOVER_OPENED'
+  | 'COMMUNITY_OPENED'
+  | 'COMMUNITY_TOPIC_OPENED'
+  | 'VOICE_MEMORY_PLAYED'
+  | 'VOICE_MEMORY_RECORDING_STARTED'
+  | 'VOICE_MEMORY_SHARED'
+  | 'CHAT_OPENED'
+  | 'CHAT_MESSAGE_SENT'
+  | 'CHAT_VOICE_MESSAGE_SENT';
 
 export interface AuditEvent {
   id: string;

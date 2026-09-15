@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest';
 import { 
   initialSeniorProfile, 
   initialRelationships, 
-  initialMedications, 
   initialMedicationEvents, 
   initialCareTasks,
   initialHandoverReport 
@@ -40,7 +39,7 @@ describe('SANGAM End-to-End Multi-Role Workflow Logic', () => {
     expect(bpTask?.vitalsData?.bloodPressure).toBe('126/80');
 
     const glucoseTask = tasks.find((t) => t.category === 'VITALS');
-    expect(glucoseTask?.vitalsData?.bloodSugar).toBe(118);
+    expect(glucoseTask?.vitalsData?.bloodSugar).toBe(114);
     expect(glucoseTask?.concernNote).toBeDefined();
   });
 
