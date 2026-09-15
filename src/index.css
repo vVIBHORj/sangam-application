@@ -1,0 +1,222 @@
+/* ==========================================================================
+   SANGAM: Core Design System & Accessibility CSS Tokens
+   Grounded in the Psychology & Physiology of Aging (WCAG AAA Target)
+   ========================================================================== */
+
+:root {
+  /* Sangam Curated Color System */
+  --color-primary-deep-blue: #17324D;
+  --color-primary-deep-blue-hover: #12283E;
+  --color-secondary-teal: #197278;
+  --color-secondary-teal-hover: #135A5F;
+  --color-background-cream: #F7F4EE; /* Anti-glare base canvas */
+  --color-surface-sand: #F4F1E9;     /* Container card groupings */
+  --color-surface-sage: #EAF4F4;     /* Reassurance & positive states */
+  --color-text-ink: #172026;         /* Maximum contrast body copy */
+  --color-text-muted: #4A5A66;       /* Subheadings & metadata (min 4.8:1) */
+  --color-urgent-red: #B42318;       /* Urgent alerts & emergency triggers */
+  --color-urgent-red-bg: #FEF3F2;    /* Alert callout background */
+  --color-white: #FFFFFF;            /* Card highlights */
+  --color-border-subtle: #E2DDD5;    /* Clear boundary outlines */
+
+  /* Touch Target Minimum Floors */
+  --target-universal-min: 44px;
+  --target-senior-primary: 56px;
+  --target-sos-button: 72px;
+
+  /* Typography Scales */
+  --font-family-primary: 'Atkinson Hyperlegible', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-secondary: 'Inter', system-ui, sans-serif;
+  --font-family-brand: 'Outfit', sans-serif;
+
+  /* Dynamic Text Multiplier */
+  --font-scale: 1.0;
+
+  /* Spacing Scale */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-xxl: 48px;
+
+  /* Border Radii */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-full: 9999px;
+
+  /* Elevation Shadows (Soft & Non-distracting) */
+  --shadow-subtle: 0 2px 6px rgba(23, 50, 77, 0.05);
+  --shadow-card: 0 4px 14px rgba(23, 50, 77, 0.08);
+  --shadow-elevated: 0 8px 24px rgba(23, 50, 77, 0.12);
+  --shadow-urgent: 0 4px 20px rgba(180, 35, 24, 0.25);
+}
+
+/* Base Styles & Anti-glare Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background-color: #EDE8DF; /* Framing background for preview */
+  color: var(--color-text-ink);
+  font-family: var(--font-family-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Typography Classes */
+.font-brand {
+  font-family: var(--font-family-brand);
+  letter-spacing: -0.02em;
+}
+
+.senior-headline {
+  font-size: calc(28px * var(--font-scale));
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--color-primary-deep-blue);
+}
+
+.senior-subhead {
+  font-size: calc(22px * var(--font-scale));
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-text-ink);
+}
+
+.senior-body {
+  font-size: calc(18px * var(--font-scale));
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--color-text-ink);
+}
+
+.senior-action-text {
+  font-size: calc(20px * var(--font-scale));
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+/* Interactive Element Accessibility */
+button, a, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+button:focus-visible, a:focus-visible, input:focus-visible {
+  outline: 3px solid var(--color-primary-deep-blue);
+  outline-offset: 3px;
+}
+
+/* Safe Touch Target Class */
+.touch-target-senior {
+  min-height: var(--target-senior-primary);
+  min-width: var(--target-senior-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.touch-target-senior:active {
+  transform: scale(0.98);
+}
+
+/* Functional Transitions */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Subtle Pulse for Active Emergency State */
+@keyframes emergency-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(180, 35, 24, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 16px rgba(180, 35, 24, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(180, 35, 24, 0);
+  }
+}
+
+.pulse-emergency {
+  animation: emergency-pulse 2s infinite;
+}
+
+/* Mobile Frame & Viewport Emulation */
+.mobile-device-shell {
+  width: 100%;
+  max-width: 440px;
+  height: 100vh;
+  max-height: 920px;
+  background-color: var(--color-background-cream);
+  border-radius: 36px;
+  box-shadow: 0 20px 60px rgba(23, 50, 77, 0.25);
+  border: 8px solid #283747;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+@media (max-width: 480px) {
+  .mobile-device-shell {
+    max-width: 100%;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+    border: none;
+  }
+}
+
+.scroll-container {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 24px;
+}
+
+/* Custom Scrollbar */
+.scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scroll-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+  background: var(--color-border-subtle);
+  border-radius: var(--radius-full);
+}
