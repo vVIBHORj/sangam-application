@@ -58,7 +58,7 @@ SANGAM provides three distinct UI paradigms tailored to each user role:
    ```bash
    npm run dev
    ```
-   Open your browser at `http://localhost:5173`.
+   Open your browser at `http://localhost:3000`.
 
 ---
 
