@@ -8,16 +8,16 @@ interface MoodSelectorProps {
 
 interface MoodOption {
   mood: CheckInMood;
-  emoji: string;
+  icon: string;
   label: string;
   ariaDesc: string;
 }
 
 const options: MoodOption[] = [
-  { mood: 'GOOD', emoji: '😊', label: 'Good', ariaDesc: 'Feeling good today' },
-  { mood: 'OKAY', emoji: '🙂', label: 'Okay', ariaDesc: 'Feeling okay today' },
-  { mood: 'NOT_GREAT', emoji: '😐', label: 'Not great', ariaDesc: 'Feeling not so great' },
-  { mood: 'NEED_HELP', emoji: '😟', label: 'Need help', ariaDesc: 'I need some help' },
+  { mood: 'GOOD', icon: '/Good.png', label: 'Good', ariaDesc: 'Feeling good today' },
+  { mood: 'OKAY', icon: '/Okay.png', label: 'Okay', ariaDesc: 'Feeling okay today' },
+  { mood: 'NOT_GREAT', icon: '/Not_great.png', label: 'Not great', ariaDesc: 'Feeling not so great' },
+  { mood: 'NEED_HELP', icon: '/Need_help.png', label: 'Need help', ariaDesc: 'I need some help' },
 ];
 
 export const MoodSelector: React.FC<MoodSelectorProps> = ({ selectedMood, onSelectMood }) => {
@@ -38,16 +38,41 @@ export const MoodSelector: React.FC<MoodSelectorProps> = ({ selectedMood, onSele
               color: isSelected ? '#FFFFFF' : '#17324D',
               border: isSelected ? '3px solid #17324D' : '2px solid #E2DDD5',
               borderRadius: '16px',
-              padding: '12px 6px',
-              minHeight: '76px',
+              padding: '10px 4px 12px 4px',
+              minHeight: '110px',
               boxShadow: isSelected ? 'var(--shadow-card)' : 'var(--shadow-subtle)',
               cursor: 'pointer',
               transition: 'transform 0.15s ease, background-color 0.15s ease',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
-            <span style={{ fontSize: '28px', lineHeight: 1, marginBottom: '6px' }} role="img" aria-hidden="true">
-              {opt.emoji}
-            </span>
+            <div
+              style={{
+                width: '56px',
+                height: '56px',
+                marginBottom: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '12px',
+                backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.2)' : '#F7F4EE',
+                padding: '6px',
+                overflow: 'hidden',
+              }}
+            >
+              <img
+                src={opt.icon}
+                alt={opt.label}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain',
+                  display: 'block',
+                }}
+              />
+            </div>
             <span style={{ fontSize: '15px', fontWeight: 700, textAlign: 'center', lineHeight: 1.2 }}>
               {opt.label}
             </span>
@@ -57,3 +82,4 @@ export const MoodSelector: React.FC<MoodSelectorProps> = ({ selectedMood, onSele
     </div>
   );
 };
+
